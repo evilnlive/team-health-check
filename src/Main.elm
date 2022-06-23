@@ -7,7 +7,6 @@ import Html.Events exposing (onClick)
 
 
 
--- import Html.Attributes exposing (title)
 -- MAIN
 
 
@@ -33,23 +32,25 @@ type alias Question =
 
 
 type alias Vote =
-    { questionOption : QuestionOption
-    }
+    { questionOption : QuestionOption, user : User }
 
 
-type alias Session =
-    { questions : List Question
-    , votes : List Vote
-    }
+type alias User =
+    { id : String, name : String }
+
+
+type alias UserSession =
+    { user : User, questions : List Question, votes : List Vote }
 
 
 type alias Model =
-    Session
+    UserSession
 
 
 init : Model
 init =
-    { questions =
+    { user = { id = "user1", name = "User One" }
+    , questions =
         [ { id = "q1", title = "Fråga 1", options = [ { id = "q1a", text = "Alternativ A" }, { id = "q1b", text = "Alternativ B" }, { id = "q1c", text = "Alternativ C" } ] }
         , { id = "q2", title = "Fråga 2", options = [ { id = "q2a", text = "Alternativ A" }, { id = "q2b", text = "Alternativ B" }, { id = "q2c", text = "Alternativ C" } ] }
         ]
@@ -69,7 +70,7 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         VoteOn questionOption ->
-            { model | votes = model.votes ++ [ { questionOption = questionOption } ] }
+            { model | questions = model.questions, votes = model.votes ++ [ { questionOption = questionOption, user = model.user } ] }
 
 
 
@@ -95,5 +96,5 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "questions" ] (renderQuestions model.questions)
-        , div [ class "votes" ] [ ul [] (List.map (\a -> li [] [ text a.questionOption.text ]) model.votes) ]
+        , div [ class "votes" ] [ ul [] (List.map (\a -> li [] [ text (a.questionOption.text ++ " - " ++ a.user.name) ]) model.votes) ]
         ]
